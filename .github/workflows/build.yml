@@ -27,6 +27,6 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: "13"
+                  node-version: "12"
             - run: npm install --global neon-cli
             - run: neon build --release

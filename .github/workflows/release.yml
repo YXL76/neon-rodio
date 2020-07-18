@@ -36,7 +36,7 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: "13"
+                  node-version: "12"
             - run: npm install --global neon-cli
             - run: neon build --release
             - uses: actions/upload-artifact@v2
@@ -55,7 +55,7 @@ jobs:
             - name: Install Node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: "13"
+                  node-version: "12"
                   registry-url: "https://registry.npmjs.org"
             - run: npm publish
               env:
