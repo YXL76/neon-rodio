@@ -1,6 +1,6 @@
 {
     "name": "neon-rodio",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Rodio for Node.js",
     "main": "lib/index.js",
     "repository": {
