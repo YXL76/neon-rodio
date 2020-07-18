@@ -9,7 +9,7 @@ exclude = ["artifacts.json", "index.node"]
 
 [lib]
 name = "neon_rodio"
-crate-type = ["cdylib"]
+crate-type = ["staticlib"]
 
 [build-dependencies]
 neon-build = "0.4.0"
