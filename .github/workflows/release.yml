@@ -50,6 +50,23 @@ jobs:
         name: Publish
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "13"
+                  registry-url: "https://registry.npmjs.org"
+            - run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    Release:
+        needs: build
+        runs-on: ubuntu-latest
+        name: Release
+
+        steps:
             - uses: actions/checkout@v2
             - uses: actions/create-release@v1
               id: create_release
