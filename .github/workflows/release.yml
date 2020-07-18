@@ -1,0 +1,91 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+    build:
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest, windows-latest]
+                include:
+                    - os: macos-latest
+                      bin: rs-player
+                    - os: ubuntu-latest
+                      bin: rs-player
+                    - os: windows-latest
+                      bin: rs-player.exe
+
+        name: Build for ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+
+        steps:
+            - name: Installing needed Ubuntu dependencies
+              if: matrix.os == 'ubuntu-latest'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y libasound2-dev
+            - uses: actions-rs/toolchain@v1
+              with:
+                  toolchain: nightly
+                  override: true
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Install Node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "13"
+            - run: npm install --global neon-cli
+            - run: neon build --release
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: ${{ matrix.os }}
+                  path: native/index.node
+
+    Publish:
+        needs: build
+        runs-on: ubuntu-latest
+        name: Publish
+
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/create-release@v1
+              id: create_release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: ${{ github.ref }}
+                  draft: false
+                  prerelease: false
+
+            - uses: actions/download-artifact@v2
+              with:
+                  path: ./artifact
+
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifact/macos-latest/index.node
+                  asset_name: index-mac.node
+                  asset_content_type: application/zip
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifact/ubuntu-latest/index.node
+                  asset_name: index-linux.node
+                  asset_content_type: application/zip
+            - uses: actions/upload-release-asset@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./artifact/windows-latest/index.node
+                  asset_name: index-win.node
+                  asset_content_type: application/zip
