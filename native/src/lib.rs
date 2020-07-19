@@ -171,7 +171,7 @@ declare_types! {
             Ok(cx.number(res).upcast())
         }
 
-        method set_volume(mut cx) {
+        method setVolume(mut cx) {
             let level = cx.argument::<JsNumber>(0)?.value() / 100.0;
             {
                 let this = cx.this();
@@ -182,7 +182,7 @@ declare_types! {
             Ok(cx.undefined().upcast())
         }
 
-        method is_paused(mut cx) {
+        method isPaused(mut cx) {
             let res = {
                 let this = cx.this();
                 let guard = cx.lock();
