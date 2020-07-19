@@ -161,7 +161,7 @@ declare_types! {
             Ok(cx.undefined().upcast())
         }
 
-        method stop(mut cx) {
+        method volume(mut cx) {
             let res = {
                 let this = cx.this();
                 let guard = cx.lock();
