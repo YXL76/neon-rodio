@@ -1,7 +1,6 @@
 use neon::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
-use std::thread::sleep;
 use std::time::{Duration, Instant};
 
 enum Status {
@@ -41,29 +40,20 @@ pub struct Player {
 
 impl Player {
     pub fn load(&mut self, url: &str) -> bool {
-        let mut i = 5;
-        while i > 0 {
-            if match File::open(url) {
-                Ok(file) => match rodio::Decoder::new(BufReader::new(file)) {
-                    Ok(source) => {
-                        self.stop();
-                        let device = rodio::default_output_device().unwrap();
-                        self.sink = rodio::Sink::new(&device);
-                        self.sink.append(source);
-                        self.play();
-                        true
-                    }
-                    _ => false,
-                },
+        match File::open(url) {
+            Ok(file) => match rodio::Decoder::new(BufReader::new(file)) {
+                Ok(source) => {
+                    self.stop();
+                    let device = rodio::default_output_device().unwrap();
+                    self.sink = rodio::Sink::new(&device);
+                    self.sink.append(source);
+                    self.play();
+                    true
+                }
                 _ => false,
-            } {
-                break;
-            } else {
-                i -= 1;
-                sleep(Duration::from_millis(256));
-            }
+            },
+            _ => false,
         }
-        i > 0
     }
 
     pub fn play(&mut self) {
@@ -210,21 +200,6 @@ declare_types! {
                 player.position()
             };
             Ok(cx.number(res as f64).upcast())
-        }
-
-        method state(mut cx) {
-            let res = {
-                let this = cx.this();
-                let guard = cx.lock();
-                let player = this.borrow(&guard);
-                format!(
-                    "{{ \"empty\": {}, \"playing\": {}, \"position\": {} }}",
-                    !player.empty(),
-                    !player.is_paused(),
-                    player.position()
-                )
-            };
-            Ok(cx.string(res).upcast())
         }
     }
 }
