@@ -10,13 +10,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        include:
-          - os: macos-latest
-            bin: rs-player
-          - os: ubuntu-latest
-            bin: rs-player
-          - os: windows-latest
-            bin: rs-player.exe
 
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
