@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 neon-build = "0.5.1"
 
 [dependencies]
-neon = "0.5.1"
+neon = "0.5.2"
 rodio = "0.11.0"
 
 [profile.release]
