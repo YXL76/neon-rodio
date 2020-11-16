@@ -12,7 +12,7 @@ name = "neon_rodio"
 crate-type = ["cdylib"]
 
 [build-dependencies]
-neon-build = "0.5.1"
+neon-build = "0.5.2"
 
 [dependencies]
 neon = "0.5.1"
