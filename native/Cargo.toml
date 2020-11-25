@@ -16,7 +16,7 @@ neon-build = "0.5.3"
 
 [dependencies]
 neon = "0.5.3"
-rodio = "0.11.0"
+rodio = "0.13.0"
 
 [profile.release]
 lto = true
