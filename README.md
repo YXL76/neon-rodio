@@ -4,8 +4,6 @@
 
 ## Installation
 
-Before installation, see [Install Node Build Tools](https://neon-bindings.com/docs/getting-started#install-node-build-tools)
-
 ```bash
 npm install neon-rodio
 yarn add neon-rodio
@@ -14,21 +12,20 @@ yarn add neon-rodio
 ## Usage
 
 ```javascript
-const rodio = require("neon-rodio");
+const NeonRodio = require("../../neon-rodio");
 
-const player = new rodio();
+const player = new NeonRodio();
 
 player.load("path/to/test.wav");
 ```
 
-## Methods
+## APIs
 
-- load(url: string): boolean
-- play(): boolean
-- pause(): void
-- stop(): void
-- volume(): number
-- setVolume(level: number): void
-- isPaused(): boolean
-- empty(): boolean
-- position(): number
+```typescript
+.empty(url: string): boolean;     // check if playback is empty
+.load(): boolean;                 // load music file (return true if loading succeeded)
+.pause(): void;                   // pause playback
+.play(): boolean;                 // resume playback (return true if playback doesn't end)
+.volume(level: number): void;     // set player volume (0-100)
+.stop(): void;                    // stop playback
+```

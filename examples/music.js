@@ -1,8 +1,17 @@
 const path = require("path");
-const { playerNew, playerLoad, playerPosition } = require("../../neon-rodio");
+const NeonRodio = require("../../neon-rodio");
 
-const player = playerNew();
+const player = new NeonRodio();
 
-playerLoad(player, path.resolve(__dirname, "music.wav"));
+player.load(path.resolve(__dirname, "music.wav"));
 
-setInterval(() => console.log(playerPosition(player)), 1000);
+let flag = false;
+
+setInterval(() => {
+  if (flag) {
+    player.play();
+  } else {
+    player.pause();
+  }
+  flag = !flag;
+}, 2000);

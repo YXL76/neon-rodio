@@ -1,51 +1,5 @@
 use neon::prelude::*;
-use std::{
-    cell::RefCell,
-    fs::File,
-    io::BufReader,
-    sync::mpsc,
-    thread,
-    time::{Duration, Instant},
-};
-
-enum Status {
-    Playing(Instant, Duration),
-    Stopped(Duration),
-}
-
-impl Status {
-    #[inline]
-    fn new() -> Status {
-        Status::Stopped(Duration::from_nanos(0))
-    }
-
-    #[inline]
-    fn elapsed(&self) -> Duration {
-        match *self {
-            Status::Stopped(d) => d,
-            Status::Playing(start, extra) => start.elapsed() + extra,
-        }
-    }
-
-    #[inline]
-    fn stop(&mut self) {
-        if let Status::Playing(start, extra) = *self {
-            *self = Status::Stopped(start.elapsed() + extra)
-        }
-    }
-
-    #[inline]
-    fn play(&mut self) {
-        if let Status::Stopped(duration) = *self {
-            *self = Status::Playing(Instant::now(), duration)
-        }
-    }
-
-    #[inline]
-    fn reset(&mut self) {
-        *self = Status::Stopped(Duration::from_nanos(0));
-    }
-}
+use std::{cell::RefCell, fs::File, io::BufReader, sync::mpsc, thread, time::Duration};
 
 #[derive(Clone)]
 enum ControlEvent {
@@ -57,7 +11,6 @@ enum ControlEvent {
 }
 
 pub struct Player {
-    status: Status,
     control_tx: mpsc::Sender<ControlEvent>,
     info_rx: mpsc::Receiver<bool>,
 }
@@ -72,7 +25,6 @@ impl Player {
         let (control_tx, _) = mpsc::channel();
         let (_, info_rx) = mpsc::channel();
         Self {
-            status: Status::new(),
             control_tx,
             info_rx,
         }
@@ -111,7 +63,6 @@ impl Player {
                 self.control_tx = control_tx;
                 self.info_rx = info_rx;
                 let _ = self.info_rx.recv();
-                self.status.play();
                 return true;
             }
         }
@@ -121,19 +72,16 @@ impl Player {
     #[inline]
     fn play(&mut self) {
         let _ = self.control_tx.send(ControlEvent::Play);
-        self.status.play()
     }
 
     #[inline]
     fn pause(&mut self) {
         let _ = self.control_tx.send(ControlEvent::Pause);
-        self.status.stop()
     }
 
     #[inline]
     fn stop(&mut self) {
         let _ = self.control_tx.send(ControlEvent::Stop);
-        self.status.reset()
     }
 
     #[inline]
@@ -149,11 +97,6 @@ impl Player {
             }
         }
         true
-    }
-
-    #[inline]
-    fn position(&self) -> u128 {
-        self.status.elapsed().as_millis()
     }
 }
 
@@ -199,7 +142,7 @@ pub fn player_stop(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 
     Ok(cx.undefined())
 }
-pub fn player_set_volume(mut cx: FunctionContext) -> JsResult<JsUndefined> {
+pub fn player_volume(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let player = cx.argument::<JsBox<RefCell<Player>>>(0)?;
     let level = cx.argument::<JsNumber>(1)?.value(&mut cx) / 100.0;
     player.borrow().set_volume(level as f32);
@@ -214,13 +157,6 @@ pub fn player_empty(mut cx: FunctionContext) -> JsResult<JsBoolean> {
     Ok(cx.boolean(res))
 }
 
-pub fn player_position(mut cx: FunctionContext) -> JsResult<JsNumber> {
-    let player = cx.argument::<JsBox<RefCell<Player>>>(0)?;
-    let res = player.borrow().position();
-
-    Ok(cx.number(res as f64 / 1000.0))
-}
-
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("playerEmpty", player_empty)?;
@@ -228,8 +164,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("playerNew", player_new)?;
     cx.export_function("playerPause", player_pause)?;
     cx.export_function("playerPlay", player_play)?;
-    cx.export_function("playerPosition", player_position)?;
-    cx.export_function("playerSetVolume", player_set_volume)?;
+    cx.export_function("playerVolume", player_volume)?;
     cx.export_function("playerStop", player_stop)?;
 
     Ok(())
