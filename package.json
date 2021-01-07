@@ -1,7 +1,7 @@
 {
   "name": "neon-rodio",
   "version": "0.2.0",
-  "description": "Rodio for Node.js",
+  "description": "Rodio for Node.js. Music play library",
   "main": "lib/index.js",
   "types": "index.d.ts",
   "repository": {

@@ -2,6 +2,8 @@
 
 > Rodio for Node.js
 
+`neon-rodio` allows you to play music files using javascript
+
 ## Installation
 
 ```bash
